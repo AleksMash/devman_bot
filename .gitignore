@@ -141,4 +141,4 @@ cython_debug/
 .idea/
 
 # others
-temp.py
+bot.py
