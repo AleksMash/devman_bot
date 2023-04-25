@@ -23,8 +23,8 @@ TG_CLIENTS_TOKEN=<токен бота>
 # Использование
 
 - задайте переменные окружения (см. выше)
-- запустите скрпит `python bot.py`
-- скрипт запросит ввод вашего chat_id - введите его.
-	- как узнать chat_id читайте здесь: [Как узнать свой ID в Telegram Bot и получить адрес канала: get chat user и где посмотреть группу](https://stelegram.ru/ispolzovanie/kak-uznat-id-chata-polzovatelya-i-kanala)
+- запустите скрпит `python bot.py <chat_id>`
+  - chat_id - ID вашего чата с ботом
+    - как узнать chat_id читайте здесь: [Как узнать свой ID в Telegram Bot и получить адрес канала: get chat user и где посмотреть группу](https://stelegram.ru/ispolzovanie/kak-uznat-id-chata-polzovatelya-i-kanala)
 
 Если запуск прошел успешно бот перейдет в режим "прослушивания" [API DevMan](https://dvmn.org/api/docs) в режиме long-polling. В случае, если работа будет проверена в ваш чат c ботом придет соответствующее сообщение.

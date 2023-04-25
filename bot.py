@@ -1,13 +1,20 @@
 from time import sleep
 
 import telegram
+import argparse
 from environs import Env
 
 import requests
 
 
-def main(bot_token, chat_id):
-    headers = {'Authorization': f'Token {bot_token}'}
+def main():
+    env = Env()
+    env.read_env()
+    parser = argparse.ArgumentParser(description='Devman bot')
+    parser.add_argument('chat_id', type=str, help='chat_id вашего чата с телеграм-ботом')
+    args = parser.parse_args()
+    chat_id = args.chat_id
+    headers = {'Authorization': f'Token {env.str("DVMN_TOKEN")}'}
     params = {}
     bot = telegram.Bot(token=env.str('TG_CLIENTS_TOKEN'))
     while True:
@@ -17,10 +24,9 @@ def main(bot_token, chat_id):
                 headers=headers,
                 params=params
             )
-        except requests.exceptions.ReadTimeout as e:
-            print('Посылаем запрос еще раз')
-        except requests.exceptions.ConnectionError as e:
-            print('Пропал интернет, подождем 3 сек')
+        except requests.exceptions.ReadTimeout:
+            pass
+        except requests.exceptions.ConnectionError:
             sleep(3)
         else:
             response.raise_for_status()
@@ -28,24 +34,15 @@ def main(bot_token, chat_id):
             if not checks.get('status') == 'found':
                 params = {'timestamp': checks['timestamp_to_request']}
             else:
-                updates = bot.get_updates()
                 lesson_info = checks['new_attempts'][0]
-                msg_parts = [None for i in range(3)]
-                msg_parts[0] = f'У вас проверили работу "{lesson_info["lesson_title"]}"\n'
+                msg_text = f'У вас проверили работу "{lesson_info["lesson_title"]}"\n\n'
                 if lesson_info['is_negative']:
-                    msg_parts[1] = 'К сожалению в работе нашлись ошибки'
+                    msg_text += 'К сожалению в работе нашлись ошибки\n'
                 else:
-                    msg_parts[1] = 'Ваша работа принята! Можно приступать к следующему уроку.'
-                msg_parts[2] = f'Cсылка на работу: {lesson_info["lesson_url"]}'
-                bot.send_message(chat_id=chat_id, text='\n'.join(msg_parts))
-            print(checks)
+                    msg_text += f'Ваша работа принята! Можно приступать к следующему уроку.\n\n'
+                msg_text += f'Cсылка на работу: {lesson_info["lesson_url"]}'
+                bot.send_message(chat_id=chat_id, text=msg_text)
 
 
 if __name__ == "__main__":
-    env = Env()
-    env.read_env()
-    chat_id = input('Введите ваш chat_id: ')
-    if not chat_id:
-        print('Вы не указали chat_id')
-    else:
-        main(env.str('DVMN_TOKEN'))
+    main()
